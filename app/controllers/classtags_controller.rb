@@ -1,0 +1,2 @@
+class ClasstagsController < ApplicationController
+end
