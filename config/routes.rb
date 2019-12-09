@@ -1,5 +1,9 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  get  'classinfos/all', to: 'classinfos#all'
+  get  'classinfos/list', to: 'classinfos#list'
+  get  'classinfos/tag', to: 'classinfos#find_by_tag'
+  get  'classinfos/filter', to: 'classinfos#filter'
   resources :friendships
   resources :userclasses
   resources :favoriteinstitutions
@@ -16,6 +20,7 @@ Rails.application.routes.draw do
   resources :todos do
     resources :items
   end
+
   post 'signup', to: 'users#create'
   post 'auth/login', to: 'authentication#authenticate'
 end

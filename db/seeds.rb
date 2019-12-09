@@ -19,17 +19,21 @@ User.delete_all
               city:Faker::Address.city,province:Faker::Address.state,street:Faker::Address.street_address,building:Faker::Address.building_number,unit:Faker::Address.community,
               zipcode:Faker::Address.zip_code,nationality:Faker::Nation.nationality,phone_number:Faker::PhoneNumber.phone_number,emergency_name:Faker::Name.name,emergency_contact:Faker::PhoneNumber.phone_number,
               is_terminated:Faker::Boolean.boolean,is_searchable:Faker::Boolean.boolean,is_previous_classes_visible:Faker::Boolean.boolean,is_coming_classes_visible:Faker::Boolean.boolean,
-              is_favorite_institutions_visible:Faker::Boolean.boolean,name:Faker::Name.name)
+              is_favorite_institutions_visible:Faker::Boolean.boolean,name:Faker::Name.name,role:User::ROLES[Faker::Number.within(range: 0..2)])
   Institution.create(star_num:Faker::Number.within(range: 1..5),feedback_count:Faker::Number.within(range: 1..5000),general_info:Faker::Lorem.paragraphs(number: 3, supplemental: true),country:Faker::Address.country,
                      city:Faker::Address.city,province:Faker::Address.state,street:Faker::Address.street_address,building:Faker::Address.building_number,unit:Faker::Address.community,
                      zipcode:Faker::Address.zip_code,latitude:Faker::Address.latitude,longitude:Faker::Address.longitude,location_instruction:Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false)).save!
   Category.create!(name:Faker::Game.genre)
   Tag.create!(name:Faker::Music.genre)
-  Classinfo.create!(time:Faker::Time.between_dates(from: Date.today - 5, to: Date.today+5, period: :all),duration_in_min:Faker::Number.within(range: 30..90),
+end
+
+100.times do
+  Institution.all[Faker::Number.within(range: 1..99)].classinfos.create(
+  time:Faker::Time.between_dates(from: Date.today - 5, to: Date.today+5, period: :all),duration_in_min:Faker::Number.within(range: 30..90),
                     name:Faker::Game.title,level:Faker::Number.within(range: 0..5),general_info:Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false),
                     preparation_info:Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false),arrival_ahead_in_min:Faker::Number.within(range: 10..30),
                     additional_info: Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false),vacancies:Faker::Number.within(range: 10..50),
-                    is_available:Faker::Boolean.boolean,bookable_before:Faker::Boolean.boolean,bookable_after:Faker::Boolean.boolean)
+                    is_available:Faker::Boolean.boolean,bookable_before:Faker::Boolean.boolean,bookable_after:Faker::Boolean.boolean,credit:Faker::Number.within(range: 5..20))
 
 end
 
@@ -45,5 +49,6 @@ end
   Classcategory.create!(classinfo:Classinfo.all[Faker::Number.within(range: 1..99)],category:Category.all[Faker::Number.within(range: 1..99)])
   Institutioncategory.create!(institution:Institution.all[Faker::Number.within(range: 1..99)],category:Category.all[Faker::Number.within(range: 1..99)])
 end
+
 
 

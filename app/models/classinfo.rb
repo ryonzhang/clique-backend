@@ -6,4 +6,5 @@ class Classinfo < ApplicationRecord
   has_many :categories ,through: :classcategories
   has_many :userclasses
   has_many :users, through: :userclasses
+  belongs_to :institution
 end

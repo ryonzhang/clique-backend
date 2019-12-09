@@ -1,5 +1,7 @@
 # app/models/user.rb
 class User < ApplicationRecord
+
+  ROLES = %i[admin partner consumer]
   # encrypt password
   has_secure_password
 
