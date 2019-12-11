@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_10_054050) do
+ActiveRecord::Schema.define(version: 2019_12_10_054051) do
 
   create_table "categories", force: :cascade do |t|
     t.string "name"
@@ -112,6 +112,7 @@ ActiveRecord::Schema.define(version: 2019_12_10_054050) do
     t.text "location_instruction"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name"
   end
 
   create_table "institutiontags", force: :cascade do |t|

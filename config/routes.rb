@@ -4,6 +4,11 @@ Rails.application.routes.draw do
   get  'classinfos/list', to: 'classinfos#list'
   get  'classinfos/tag', to: 'classinfos#find_by_tag'
   get  'classinfos/filter', to: 'classinfos#filter'
+  get  'classinfos/upcoming', to: 'classinfos#upcoming'
+  get  'classinfos/completed', to: 'classinfos#completed'
+  get  'classinfos/new', to: 'classinfos#new'
+  post 'classinfos/link/:id(.:format)', to: 'classinfos#link'
+  post 'classinfos/delink/:id(.:format)', to: 'classinfos#delink'
   resources :friendships
   resources :userclasses
   resources :favoriteinstitutions

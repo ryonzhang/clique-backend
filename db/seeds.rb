@@ -20,7 +20,7 @@ User.delete_all
               zipcode:Faker::Address.zip_code,nationality:Faker::Nation.nationality,phone_number:Faker::PhoneNumber.phone_number,emergency_name:Faker::Name.name,emergency_contact:Faker::PhoneNumber.phone_number,
               is_terminated:Faker::Boolean.boolean,is_searchable:Faker::Boolean.boolean,is_previous_classes_visible:Faker::Boolean.boolean,is_coming_classes_visible:Faker::Boolean.boolean,
               is_favorite_institutions_visible:Faker::Boolean.boolean,name:Faker::Name.name,role:User::ROLES[Faker::Number.within(range: 0..2)])
-  Institution.create(star_num:Faker::Number.within(range: 1..5),feedback_count:Faker::Number.within(range: 1..5000),general_info:Faker::Lorem.paragraphs(number: 3, supplemental: true),country:Faker::Address.country,
+  Institution.create(name:Faker::Music.album,star_num:Faker::Number.within(range: 1..5),feedback_count:Faker::Number.within(range: 1..5000),general_info:Faker::Lorem.paragraphs(number: 3, supplemental: true),country:Faker::Address.country,
                      city:Faker::Address.city,province:Faker::Address.state,street:Faker::Address.street_address,building:Faker::Address.building_number,unit:Faker::Address.community,
                      zipcode:Faker::Address.zip_code,latitude:Faker::Address.latitude,longitude:Faker::Address.longitude,location_instruction:Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false)).save!
   Category.create!(name:Faker::Game.genre)
