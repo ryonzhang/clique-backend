@@ -22,7 +22,7 @@ User.delete_all
               is_favorite_institutions_visible:Faker::Boolean.boolean,name:Faker::Name.name,role:User::ROLES[Faker::Number.within(range: 0..2)])
   Institution.create(name:Faker::Music.album,star_num:Faker::Number.within(range: 1..5),feedback_count:Faker::Number.within(range: 1..5000),general_info:Faker::Lorem.paragraphs(number: 3, supplemental: true),country:Faker::Address.country,
                      city:Faker::Address.city,province:Faker::Address.state,street:Faker::Address.street_address,building:Faker::Address.building_number,unit:Faker::Address.community,
-                     zipcode:Faker::Address.zip_code,latitude:Faker::Address.latitude,longitude:Faker::Address.longitude,location_instruction:Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false)).save!
+                     zipcode:Faker::Address.zip_code,latitude:1.255+0.2*rand,longitude:103.7+0.3*rand,location_instruction:Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false)).save!
   Category.create!(name:Faker::Game.genre)
   Tag.create!(name:Faker::Music.genre)
 end
@@ -43,7 +43,7 @@ end
   Favoriteinstitution.create!(user:User.all[Faker::Number.within(range: 1..99)],institution:Institution.all[Faker::Number.within(range: 1..99)])
   Feedback.create!(star_num:Faker::Number.within(range: 1..5),comment:Faker::Lorem.paragraph_by_chars(number: 250, supplemental: false),user:User.all[Faker::Number.within(range: 1..99)],institution:Institution.all[Faker::Number.within(range: 1..99)],
                    classinfo:Classinfo.all[Faker::Number.within(range: 1..99)])
-  Userclass.create!(user:User.all[Faker::Number.within(range: 1..99)],classinfo:Classinfo.all[Faker::Number.within(range: 1..99)])
+  Userclass.create!(user:User.all[Faker::Number.within(range: 1..99)],classinfo:Classinfo.all[Faker::Number.within(range: 1..99)],attended:Faker::Boolean.boolean)
   Classtag.create!(classinfo:Classinfo.all[Faker::Number.within(range: 1..99)],tag:Tag.all[Faker::Number.within(range: 1..99)])
   Institutiontag.create!(institution:Institution.all[Faker::Number.within(range: 1..99)],tag:Tag.all[Faker::Number.within(range: 1..99)])
   Classcategory.create!(classinfo:Classinfo.all[Faker::Number.within(range: 1..99)],category:Category.all[Faker::Number.within(range: 1..99)])

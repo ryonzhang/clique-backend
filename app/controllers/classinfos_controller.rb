@@ -20,7 +20,9 @@ class ClassinfosController < ApplicationController
 
   #admin partner
   def create
-    @classinfo=Classinfo.create!(classinfo_params)
+    institution = Institution.find(params[:institution_id])
+    return json_response({reason:'the institution does not belong to the user'}, :internal_server_error) unless current_user.institutions.include?(institution)
+    @classinfo=institution.classinfos.create!(classinfo_params)
     json_response(@classinfo, :created)
   end
 
@@ -35,8 +37,20 @@ class ClassinfosController < ApplicationController
     json_response(json_data || [])
   end
 
+  def register
+    unless current_user.institutions.map { |i| i.classinfos }.flatten.includes?(Classinfo.find(params[:class_id]))
+      return json_response({},:internal_server_error)
+    end
+    Userclass.where(user:User.find(params[:user_id]),classinfo: Classinfo.find(params[:class_id])).update(attended:true)
+    json_response({},:accepted)
+  end
+
   def upcoming
-    @classes = current_user.classinfos.select{|c| c.time>Time.now}.sort! { |x, y| x.time <=> y.time }
+    if params[:user_id]!=nil then
+      @classes = User.find(params[:user_id]).classinfos.select{|c| c.time>Time.now}.sort! { |x, y| x.time <=> y.time }.reverse!
+    else
+      @classes = current_user.classinfos.select{|c| c.time>Time.now}.sort! { |x, y| x.time <=> y.time }.reverse!
+    end
     if @classes
       json_data = @classes.map do |c|
         c.as_json(include: :institution)
@@ -46,7 +60,11 @@ class ClassinfosController < ApplicationController
   end
 
   def completed
-    @classes = current_user.classinfos.select{|c| c.time<Time.now}.sort! { |x, y| x.time <=> y.time }.reverse!
+    if params[:user_id]!=nil then
+      @classes = User.find(params[:user_id]).classinfos.select{|c| c.time<Time.now}.sort! { |x, y| x.time <=> y.time }.reverse!
+    else
+      @classes = current_user.classinfos.select{|c| c.time<Time.now}.sort! { |x, y| x.time <=> y.time }.reverse!
+    end
     if @classes
       json_data = @classes.map do |c|
         c.as_json(include: :institution)
@@ -66,18 +84,18 @@ class ClassinfosController < ApplicationController
   end
 
   def new
-    @classes = Tag.find_by_name('new').try(:classinfos).select{|c| c.time>Time.now}.sort! { |x, y| x.time <=> y.time }
+    @classes = Tag.find_by_name('new').try(:classinfos).select{|c| c.time>Time.now}.sort! { |x, y| x.time <=> y.time } unless Tag.find_by_name('new')==nil
     if @classes
       json_data = @classes.map do |c|
         c.as_json(include: :institution)
       end
     end
-    json_response(json_data || [])
+    json_response(classes:json_data || [],upcoming_count: current_user.classinfos.select{|c| c.time>Time.now}.count,completed_count:current_user.classinfos.select{|c| c.time<Time.now}.count)
   end
 
   def link
     userclass = Userclass.where(user:current_user,classinfo:@classinfo).count >0 || Userclass.create!(user:current_user,classinfo:@classinfo)
-    json_response(userclass, :created)
+    json_response(userclass, :accepted)
   end
 
   def delink
@@ -85,10 +103,19 @@ class ClassinfosController < ApplicationController
     json_response({}, :accepted)
   end
 
-  def filter
-    @classes=Classinfo.where(["credit > :lower_credit and credit < :upper_credit",{lower_credit:params[:lower_credit],upper_credit:params[:upper_credit]}]).select do |c|
-      Geocoder::Calculations.distance_between(c.institution.latitude,c.institution.longitude,params[:latitude].to_f,params[:longitude].to_f,{units: :km}) <= params[:distance].to_f*1000
-    end
+  def date
+    @classes=Classinfo.where(["credit > :lower_credit and credit < :upper_credit",{lower_credit:params[:min_credit],upper_credit:params[:max_credit]}]).where(time: params[:date].to_time.change(
+        hour: params[:min_hour],
+        min: 0,
+        sec: 0,
+        )..params[:date].to_time.change(
+        hour: params[:max_hour],
+        min: 0,
+        sec: 0,
+        )).select do |c|
+      Geocoder::Calculations.distance_between([c.institution.latitude,c.institution.longitude],[params[:latitude].to_f,params[:longitude].to_f],{units: :km}) <= params[:max_distance].to_f && Geocoder::Calculations.distance_between([c.institution.latitude,c.institution.longitude],[params[:latitude].to_f,params[:longitude].to_f],{units: :km}) >= params[:min_distance].to_f
+    end.sort! { |x, y| x.time <=> y.time }
+    @classes = @classes.select{|c| c.name.downcase.include?(params[:class_name].downcase)} unless params[:class_name].to_s.strip.empty?
     if @classes
       json_data = @classes.map do |c|
         c.as_json(include: :institution)
@@ -97,8 +124,28 @@ class ClassinfosController < ApplicationController
     json_response(json_data || [])
   end
 
+
+
   def show
-    json_response(@classinfo.as_json(include: [:institution,:tags,:categories]))
+    userclass= Userclass.find_by(user:current_user,classinfo:@classinfo)
+    feedback = Feedback.find_by(user:current_user,classinfo:@classinfo)
+    if userclass != nil
+      if userclass.attended then
+        if feedback!=nil then
+          status = 'feedbacked'
+        else
+          status = 'attended'
+        end
+      elsif Time.now > @classinfo.time.to_time then
+        status = 'missed'
+      else
+        status = 'booked'
+      end
+    else
+      status = 'open'
+    end
+
+    json_response({classinfo:@classinfo.as_json(include: [:institution,:tags,:categories]),status:status})
   end
 
   def update
@@ -109,6 +156,24 @@ class ClassinfosController < ApplicationController
   def destroy
     @classinfo.destroy
     head :no_content
+  end
+
+  def feedback
+    classinfo = Classinfo.find(params[:classinfo_id])
+    feedback = Feedback.find_by(user:current_user,classinfo:classinfo)
+    if feedback!=nil
+      feedback.update(comment:params[:comment],star_num:params[:star_num])
+      return json_response({},:accepted)
+    else
+      feedback = Feedback.create(user:current_user,classinfo:classinfo,institution:classinfo.institution,comment:params[:comment],star_num:params[:star_num])
+      return json_response(feedback,:created)
+    end
+  end
+
+  def get_feedback
+    classinfo = Classinfo.find(params[:classinfo_id])
+    feedback = Feedback.find_by(user:current_user,classinfo:classinfo)
+    json_response(feedback||{},:accepted)
   end
 
   private
