@@ -28,6 +28,21 @@ class UsersController < ApplicationController
     end
   end
 
+  def searchable
+    intended_friend_ids = Invite.where(user:current_user,status:STATUS_INVITING).map{|u| u.intended_friend_id}
+    users = User.order(:name).where(is_searchable: true).where.not(id: Friendship.where(user:current_user).map{|u| u.friend_id}).where.not(id:current_user.id).limit(params[:limit]).offset(params[:offset]).select{|c| c.name.downcase.include?(params[:search].downcase)}
+    users.map do |u|
+      u.define_singleton_method("intended=") { |val| @intended = val }
+      u.define_singleton_method(:intended) { @intended }
+      if intended_friend_ids.include?(u.id) then
+        u.intended = true
+      else
+        u.intended= false
+      end
+    end
+    json_response({users:users,intending:users.select{|u| u.intended ==true}.map{|u| u.id}}, :accepted)
+  end
+
 
   def friend
     friend = Friendship.where(user:current_user,friend:@user).count >0 || Friendship.create!(user:current_user,friend:@user)

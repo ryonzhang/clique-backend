@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   get  'institutions/:id/classes/:date', to: 'institutions#classes'
   get  'users/requested_friends', to: 'users#requested_friends'
   get  'users/friends/:user_id(.:format)', to: 'users#friends'
+  get  'users/searchable/', to: 'users#searchable'
   get  'users/friends/', to: 'users#friends'
   get  'institutions/nearby/', to: 'institutions#nearby'
   get  'institutions/:id/feedbacks/', to: 'institutions#feedbacks'
