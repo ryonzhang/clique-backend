@@ -30,7 +30,7 @@ class UsersController < ApplicationController
 
   def searchable
     intended_friend_ids = Invite.where(user:current_user,status:STATUS_INVITING).map{|u| u.intended_friend_id}
-    users = User.order(:name).where(is_searchable: true).where.not(id: Friendship.where(user:current_user).map{|u| u.friend_id}).where.not(id:current_user.id).limit(params[:limit]).offset(params[:offset]).select{|c| c.name.downcase.include?(params[:search].downcase)}
+    users = User.order(:name).where(is_searchable: true).where.not(id: Friendship.where(user:current_user).map{|u| u.friend_id}).where.not(id:current_user.id).where("LOWER(name) like LOWER(?)", "%#{params[:search]}%").limit(params[:limit]).offset(params[:offset])
     users.map do |u|
       u.define_singleton_method("intended=") { |val| @intended = val }
       u.define_singleton_method(:intended) { @intended }
@@ -62,13 +62,14 @@ class UsersController < ApplicationController
   end
 
   def accept
-    invites = Invite.where(user:current_user,intended_friend:@user)
+    invites = Invite.where(user:@user,intended_friend:current_user)
     return json_response({},:internal_server_error) if invites.count==0
+    friend
     return json_response(invites.update(status:STATUS_INVITE_ACCEPTED),:accepted)
   end
 
   def reject
-    invites = Invite.where(user:current_user,intended_friend:@user)
+    invites = Invite.where(user:@user,intended_friend:current_user)
     return json_response({},:internal_server_error) if invites.count==0
     return json_response(invites.update(status:STATUS_INVITE_REJECTED),:accepted)
   end
