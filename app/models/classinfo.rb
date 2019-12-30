@@ -1,5 +1,6 @@
 class Classinfo < ApplicationRecord
   has_many :feedbacks
+  has_many :sessions
   has_many :classtags
   has_many :tags ,through: :classtags
   has_many :classcategories

@@ -1,5 +1,5 @@
 class InstitutionsController < ApplicationController
-  before_action :set_institution, only: [:show, :update, :destroy,:classes,:feedbacks]
+  before_action :set_institution, only: [:show, :update, :destroy,:classes,:feedbacks,:fan,:defan]
   def show
     liked = current_user.institutions.include?(@institution)?true:false;
     json_response({institution:@institution.as_json(include: [:tags,:categories]),liked:liked})
@@ -11,6 +11,11 @@ class InstitutionsController < ApplicationController
     else
       return json_response(User.find(params[:user_id]).institutions,:accepted)
     end
+  end
+
+  def update
+    success = @institution.update!(institution_update_params)
+    json_response(success, :accepted)
   end
 
   def classes
@@ -47,5 +52,25 @@ class InstitutionsController < ApplicationController
 
   def set_institution
     @institution = Institution.find(params[:id])
+  end
+
+  def institution_update_params
+
+    params.permit(
+        :star_num,
+     :feedback_count,
+     :general_info,
+     :country,
+     :province,
+     :city,
+     :street,
+     :building,
+     :unit,
+     :zipcode,
+     :latitude,
+     :longitude,
+     :location_instruction,
+        :name,
+    )
   end
 end

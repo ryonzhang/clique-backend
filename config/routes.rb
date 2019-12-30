@@ -1,5 +1,6 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  get  'sessions/all', to: 'sessions#all'
   get  'classinfos/all', to: 'classinfos#all'
   get  'classinfos/list', to: 'classinfos#list'
   get  'classinfos/tag', to: 'classinfos#find_by_tag'
@@ -27,12 +28,14 @@ Rails.application.routes.draw do
   post 'users/defriend/:id(.:format)', to: 'users#defriend'
   post 'users/friend/:id(.:format)', to: 'users#friend'
   post 'classinfos/link/:id(.:format)', to: 'classinfos#link'
+  post 'classinfos/update/:id(.:format)', to: 'classinfos#update'
   post 'classinfos/delink/:id(.:format)', to: 'classinfos#delink'
   post 'classinfos/new/:institution_id', to: 'classinfos#create'
   post 'classinfos/:classinfo_id/feedback', to: 'classinfos#feedback'
   post 'institutions/fan/:id', to: 'institutions#fan'
   post 'institutions/defan/:id', to: 'institutions#defan'
   post 'users/update', to: 'users#update'
+  post 'institutions/update/:id', to: 'institutions#update'
   post 'signup', to: 'users#create'
   post 'auth/login', to: 'authentication#authenticate'
 

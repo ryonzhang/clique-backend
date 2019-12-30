@@ -1,12 +1,12 @@
 require 'geocoder'
-class ClassinfosController < ApplicationController
-  before_action :set_classinfo, only: [:show, :update, :destroy,:link,:delink]
+class SessionsController < ApplicationController
+  before_action :set_session, only: [:show, :update, :destroy,:link,:delink]
   #admin
   def all
-    @classes = Classinfo.all
-    if @classes
-      json_data = @classes.map do |c|
-        c.as_json(include: :institution)
+    @sessions = Session.all
+    if @sessions
+      json_data = @sessions.map do |c|
+        c.as_json(include: {classinfo:{include: :institution}})
       end
     end
     json_response(json_data || [])
@@ -184,7 +184,7 @@ class ClassinfosController < ApplicationController
   end
 
 
-  def set_classinfo
-    @classinfo = Classinfo.find(params[:id])
+  def set_session
+    @session = Session.find(params[:id])
   end
 end

@@ -28,13 +28,17 @@ User.delete_all
 end
 
 100.times do
-  Institution.all[Faker::Number.within(range: 1..99)].classinfos.create(
-  time:Faker::Time.between_dates(from: Date.today - 5, to: Date.today+5, period: :all),duration_in_min:Faker::Number.within(range: 30..90),
-                    name:Faker::Game.title,level:Faker::Number.within(range: 0..5),general_info:Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false),
-                    preparation_info:Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false),arrival_ahead_in_min:Faker::Number.within(range: 10..30),
-                    additional_info: Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false),vacancies:Faker::Number.within(range: 10..50),
-                    is_available:Faker::Boolean.boolean,bookable_before:Faker::Boolean.boolean,bookable_after:Faker::Boolean.boolean,credit:Faker::Number.within(range: 5..20))
-
+  institution = Institution.all[Faker::Number.within(range: 1..99)]
+  institution.classinfos.create(
+      time:Faker::Time.between_dates(from: Date.today - 5, to: Date.today+5, period: :all),duration_in_min:Faker::Number.within(range: 30..90),
+      name:Faker::Game.title,level:Faker::Number.within(range: 0..5),general_info:Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false),
+      preparation_info:Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false),arrival_ahead_in_min:Faker::Number.within(range: 10..30),
+      additional_info: Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false),vacancies:Faker::Number.within(range: 10..50),
+      credit:Faker::Number.within(range: 5..20),min_age:Faker::Number.within(range: 5..10),max_age:Faker::Number.within(range: 10..30),days_in_between:Faker::Number.within(range: 1..7))
+  10.times do
+    institution.classinfos.last.sessions.create(time:Faker::Time.between_dates(from: Date.today - 10, to: Date.today+10, period: :all),duration_in_min:Faker::Number.within(range: 30..90),
+                                                                       vacancies:Faker::Number.within(range: 10..50))
+  end
 end
 
 1000.times do

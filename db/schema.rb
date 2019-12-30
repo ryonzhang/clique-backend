@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_10_055051) do
+ActiveRecord::Schema.define(version: 2019_12_12_154050) do
 
   create_table "categories", force: :cascade do |t|
     t.string "name"
@@ -37,13 +37,13 @@ ActiveRecord::Schema.define(version: 2019_12_10_055051) do
     t.integer "arrival_ahead_in_min"
     t.text "additional_info"
     t.integer "vacancies"
-    t.boolean "is_available"
-    t.datetime "bookable_before"
-    t.datetime "bookable_after"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "institution_id"
     t.integer "credit"
+    t.integer "min_age"
+    t.integer "max_age"
+    t.integer "days_in_between"
     t.index ["institution_id"], name: "index_classinfos_on_institution_id"
   end
 
@@ -141,6 +141,16 @@ ActiveRecord::Schema.define(version: 2019_12_10_055051) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["todo_id"], name: "index_items_on_todo_id"
+  end
+
+  create_table "sessions", force: :cascade do |t|
+    t.datetime "time"
+    t.integer "duration_in_min"
+    t.integer "vacancies"
+    t.integer "classinfo_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["classinfo_id"], name: "index_sessions_on_classinfo_id"
   end
 
   create_table "tags", force: :cascade do |t|
