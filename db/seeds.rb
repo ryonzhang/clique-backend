@@ -3,11 +3,13 @@ Institutiontag.delete_all
 Classcategory.delete_all
 Classtag.delete_all
 Userclass.delete_all
+Usersession.delete_all
 Category.delete_all
 Feedback.delete_all
 Tag.delete_all
 Friendship.delete_all
 Invite.delete_all
+Session.delete_all
 Classinfo.delete_all
 Favoriteinstitution.delete_all
 Institution.delete_all
@@ -30,9 +32,9 @@ end
 100.times do
   institution = Institution.all[Faker::Number.within(range: 1..99)]
   institution.classinfos.create(
-      time:Faker::Time.between_dates(from: Date.today - 5, to: Date.today+5, period: :all),duration_in_min:Faker::Number.within(range: 30..90),
+      time:Faker::Time.between_dates(from: Date.today - 5, to: Date.today+5, period: :all),endtime:Faker::Time.between_dates(from: Date.today+75, to: Date.today+115, period: :all),duration_in_min:Faker::Number.within(range: 30..90),
       name:Faker::Game.title,level:Faker::Number.within(range: 0..5),general_info:Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false),
-      preparation_info:Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false),arrival_ahead_in_min:Faker::Number.within(range: 10..30),
+      preparation_info:Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false),arrival_ahead_in_min:Faker::Number.within(range: 10..30),instructor:Faker::Game.title,
       additional_info: Faker::Lorem.paragraph_by_chars(number: 1000, supplemental: false),vacancies:Faker::Number.within(range: 10..50),
       credit:Faker::Number.within(range: 5..20),min_age:Faker::Number.within(range: 5..10),max_age:Faker::Number.within(range: 10..30),days_in_between:Faker::Number.within(range: 1..7))
   10.times do
@@ -46,8 +48,9 @@ end
   Friendship.create(user:User.all[Faker::Number.within(range: 1..99)],friend:User.all[Faker::Number.within(range: 1..99)]).save!
   Favoriteinstitution.create!(user:User.all[Faker::Number.within(range: 1..99)],institution:Institution.all[Faker::Number.within(range: 1..99)])
   Feedback.create!(star_num:Faker::Number.within(range: 1..5),comment:Faker::Lorem.paragraph_by_chars(number: 250, supplemental: false),user:User.all[Faker::Number.within(range: 1..99)],institution:Institution.all[Faker::Number.within(range: 1..99)],
-                   classinfo:Classinfo.all[Faker::Number.within(range: 1..99)])
+                   classinfo:Classinfo.all[Faker::Number.within(range: 1..99)],session:Session.all[Faker::Number.within(range: 1..999)])
   Userclass.create!(user:User.all[Faker::Number.within(range: 1..99)],classinfo:Classinfo.all[Faker::Number.within(range: 1..99)],attended:Faker::Boolean.boolean)
+  Usersession.create!(user:User.all[Faker::Number.within(range: 1..99)],session:Session.all[Faker::Number.within(range: 1..900)],attended:Faker::Boolean.boolean)
   Classtag.create!(classinfo:Classinfo.all[Faker::Number.within(range: 1..99)],tag:Tag.all[Faker::Number.within(range: 1..99)])
   Institutiontag.create!(institution:Institution.all[Faker::Number.within(range: 1..99)],tag:Tag.all[Faker::Number.within(range: 1..99)])
   Classcategory.create!(classinfo:Classinfo.all[Faker::Number.within(range: 1..99)],category:Category.all[Faker::Number.within(range: 1..99)])

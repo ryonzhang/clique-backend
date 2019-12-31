@@ -1,5 +1,5 @@
 class InstitutionsController < ApplicationController
-  before_action :set_institution, only: [:show, :update, :destroy,:classes,:feedbacks,:fan,:defan]
+  before_action :set_institution, only: [:show, :update, :destroy,:classes,:feedbacks,:fan,:defan,:sessions]
   def show
     liked = current_user.institutions.include?(@institution)?true:false;
     json_response({institution:@institution.as_json(include: [:tags,:categories]),liked:liked})
@@ -14,13 +14,24 @@ class InstitutionsController < ApplicationController
   end
 
   def update
-    success = @institution.update!(institution_update_params)
+    success = @institution.update!(institution_params)
     json_response(success, :accepted)
+  end
+
+  def create
+    institution = Institution.create!(institution_params)
+    Favoriteinstitution.create!(user:current_user,institution:institution)
+    json_response(institution, :accepted)
   end
 
   def classes
     json_data=Classinfo.where(time: params[:date].to_time.beginning_of_day..params[:date].to_time.end_of_day,institution_id: @institution.id).sort_by(&:time)
     json_response(json_data || [])
+  end
+
+  def sessions
+    json_data=Session.where(time: params[:date].to_time.beginning_of_day..params[:date].to_time.end_of_day,classinfo_id:Classinfo.where(institution_id: @institution.id).sort_by(&:time))
+    json_response(json_data.as_json(include: {classinfo:{include: :institution}} || []))
   end
 
   def fan
@@ -54,9 +65,9 @@ class InstitutionsController < ApplicationController
     @institution = Institution.find(params[:id])
   end
 
-  def institution_update_params
-
+  def institution_params
     params.permit(
+              :id,
         :star_num,
      :feedback_count,
      :general_info,

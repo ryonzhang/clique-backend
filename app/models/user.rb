@@ -20,6 +20,7 @@ class User < ApplicationRecord
   has_many :intended_friends, through: :invites
   has_many :userclasses
   has_many :classinfos, through: :userclasses
-
+  has_many :usersessions
+  has_many :sessions, through: :usersessions
 
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_12_154050) do
+ActiveRecord::Schema.define(version: 2019_12_16_154050) do
 
   create_table "categories", force: :cascade do |t|
     t.string "name"
@@ -44,6 +44,8 @@ ActiveRecord::Schema.define(version: 2019_12_12_154050) do
     t.integer "min_age"
     t.integer "max_age"
     t.integer "days_in_between"
+    t.string "instructor"
+    t.datetime "endtime"
     t.index ["institution_id"], name: "index_classinfos_on_institution_id"
   end
 
@@ -73,8 +75,10 @@ ActiveRecord::Schema.define(version: 2019_12_12_154050) do
     t.integer "classinfo_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "session_id"
     t.index ["classinfo_id"], name: "index_feedbacks_on_classinfo_id"
     t.index ["institution_id"], name: "index_feedbacks_on_institution_id"
+    t.index ["session_id"], name: "index_feedbacks_on_session_id"
     t.index ["user_id"], name: "index_feedbacks_on_user_id"
   end
 
@@ -204,6 +208,16 @@ ActiveRecord::Schema.define(version: 2019_12_12_154050) do
     t.string "unit"
     t.string "zipcode"
     t.string "role"
+  end
+
+  create_table "usersessions", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "session_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "attended"
+    t.index ["session_id"], name: "index_usersessions_on_session_id"
+    t.index ["user_id"], name: "index_usersessions_on_user_id"
   end
 
 end

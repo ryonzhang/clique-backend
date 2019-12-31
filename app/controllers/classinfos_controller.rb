@@ -23,6 +23,10 @@ class ClassinfosController < ApplicationController
     institution = Institution.find(params[:institution_id])
     return json_response({reason:'the institution does not belong to the user'}, :internal_server_error) unless current_user.institutions.include?(institution)
     @classinfo=institution.classinfos.create!(classinfo_params)
+
+    (@classinfo.time.to_datetime.to_i .. @classinfo.endtime.to_datetime.to_i).step(@classinfo.days_in_between.day) do |datetime|
+      @classinfo.sessions.create!({time:Time.at(datetime),duration_in_min:@classinfo.duration_in_min,vacancies:@classinfo.vacancies})
+    end
     json_response(@classinfo, :created)
   end
 
@@ -179,8 +183,7 @@ class ClassinfosController < ApplicationController
   private
 
   def classinfo_params
-    params.permit(:id,:time,:duration_in_min,:name,:level,:general_info,:preparation_info,:arrival_ahead_in_min,:additional_info,:vacancies,
-                  :is_available,:bookable_before,:bookable_after)
+    params.permit(:id,:time,:endtime,:instructor,:duration_in_min,:name,:level,:general_info,:preparation_info,:arrival_ahead_in_min,:additional_info,:vacancies,:days_in_between, :credit, :institution_id, :classinfo,:duration_in_min)
   end
 
 
