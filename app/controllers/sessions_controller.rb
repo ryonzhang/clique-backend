@@ -77,13 +77,13 @@ class SessionsController < ApplicationController
   end
 
   def new
-    @sessions = Tag.find_by_name('new').try(:classinfos).select{|c| c.time>Time.now}.sort! { |x, y| x.time <=> y.time } unless Tag.find_by_name('new')==nil
+    @sessions = Tag.find_by_name('new').try(:classinfos).map{|c| c.sessions}.flatten.select{|c| c.time>Time.now}.sort! { |x, y| x.time <=> y.time } unless Tag.find_by_name('new')==nil
     if @sessions
       json_data = @sessions.map do |c|
         c.as_json(include: {classinfo:{include: :institution}})
       end
     end
-    json_response(sessions:json_data || [],upcoming_count: current_user.sessions.select{|c| c.time>Time.now}.count,completed_count:current_user.sessions.select{|c| c.time<Time.now}.count)
+    json_response(sessions:(json_data || []),upcoming_count: current_user.sessions.select{|c| c.time>Time.now}.count,completed_count:current_user.sessions.select{|c| c.time<Time.now}.count)
   end
 
   def link
